@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IdeaForge – Your Ideas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--border:#2a2a3d;--accent:#7c5cfc;--accent2:#00d4aa;--text:#e8e8f0;--muted:#6b6b85;--easy:#00d4aa;--mid:#f5a623;--hard:#ff5e7d;}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding:2rem 1rem;}
+    .wrap{max-width:780px;margin:0 auto;}
+    .top{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}
+    h1{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;}
+    .meta{color:var(--muted);font-size:.85rem;margin-top:.3rem;}
+    .meta span{color:var(--accent2);}
+    .actions{display:flex;gap:.7rem;}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);padding:.5rem 1rem;border-radius:8px;font-size:.85rem;cursor:pointer;text-decoration:none;}
+    .btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+    .btn-solid{background:var(--accent);color:#fff;border:none;padding:.5rem 1rem;border-radius:8px;font-size:.85rem;cursor:pointer;text-decoration:none;font-family:'Inter',sans-serif;}
+    .ideas{display:grid;gap:1.2rem;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.6rem;border-left:3px solid var(--accent);animation:up .4s ease both;}
+    .card:nth-child(2){animation-delay:.1s;} .card:nth-child(3){animation-delay:.2s;} .card:nth-child(4){animation-delay:.3s;} .card:nth-child(5){animation-delay:.4s;}
+    @keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.8rem;}
+    .idx{font-size:.75rem;color:var(--muted);font-weight:600;min-width:24px;}
+    .title{font-family:'Space Grotesk',sans-serif;font-size:1.08rem;font-weight:600;flex:1;}
+    .badge{font-size:.68rem;padding:.2rem .65rem;border-radius:99px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
+    .badge-b{background:rgba(0,212,170,.12);color:var(--easy);}
+    .badge-m{background:rgba(245,166,35,.12);color:var(--mid);}
+    .badge-a{background:rgba(255,94,125,.12);color:var(--hard);}
+    .desc{color:#b0b0c8;font-size:.875rem;line-height:1.65;margin-bottom:1rem;}
+    .tech-tag{font-size:.75rem;color:var(--accent2);background:rgba(0,212,170,.08);padding:.28rem .7rem;border-radius:6px;display:inline-block;margin-bottom:.9rem;}
+    .section-label{font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:.45rem;font-weight:600;}
+    .features{list-style:none;display:flex;flex-direction:column;gap:.35rem;margin-bottom:.9rem;}
+    .features li{font-size:.83rem;color:var(--muted);padding-left:1.2rem;position:relative;}
+    .features li::before{content:"→";position:absolute;left:0;color:var(--accent);}
+    .github-tip{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.7rem .9rem;font-size:.82rem;color:#9090b0;}
+    .github-tip strong{color:var(--text);}
+    .empty{text-align:center;padding:3rem;color:var(--muted);}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>✨ Your Project Ideas</h1>
+      <div class="meta">
+        For <span>{{ profession }}</span> · Level: <span>{{ experience }}</span>
+      </div>
+    </div>
+    <div class="actions">
+      <a href="/form" class="btn-ghost">← Generate Again</a>
+      <a href="/" class="btn-solid">Home</a>
+    </div>
+  </div>
+
+  {% if ideas %}
+  <div class="ideas">
+    {% for idea in ideas %}
+    <div class="card">
+      <div class="card-head">
+        <span class="idx">0{{ loop.index }}</span>
+        <span class="title">{{ idea.title }}</span>
+        <span class="badge 
+          {% if idea.difficulty == 'Beginner' %}badge-b
+          {% elif idea.difficulty == 'Advanced' %}badge-a
+          {% else %}badge-m{% endif %}">
+          {{ idea.difficulty }}
+        </span>
+      </div>
+
+      <p class="desc">{{ idea.description }}</p>
+      <div class="tech-tag">🛠 {{ idea.tech }}</div>
+
+      <div class="section-label">Key Features</div>
+      <ul class="features">
+        {% for f in idea.features %}
+        <li>{{ f }}</li>
+        {% endfor %}
+      </ul>
+
+      {% if idea.github_tip %}
+      <div class="github-tip">
+        <strong>💡 GitHub Tip:</strong> {{ idea.github_tip }}
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="empty">
+    <p>No ideas yet. <a href="/form" style="color:var(--accent)">Generate some!</a></p>
+  </div>
+  {% endif %}
+</div>
+</body>
+</html>

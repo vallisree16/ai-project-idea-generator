@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IdeaForge – Generate Ideas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0a0a0f;--surface:#12121a;--card:#1a1a26;--border:#2a2a3d;--accent:#7c5cfc;--accent2:#00d4aa;--text:#e8e8f0;--muted:#6b6b85;}
+    body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;padding:2rem 1rem;}
+    .wrap{max-width:680px;margin:0 auto;}
+    .top{display:flex;align-items:center;gap:1rem;margin-bottom:2.5rem;}
+    .back{color:var(--muted);text-decoration:none;font-size:.9rem;}
+    .back:hover{color:var(--text);}
+    h1{font-family:'Space Grotesk',sans-serif;font-size:1.6rem;font-weight:700;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;}
+    .step{font-size:.7rem;text-transform:uppercase;letter-spacing:.8px;color:var(--accent);font-weight:600;margin-bottom:.5rem;}
+    .field{margin-bottom:1.4rem;}
+    label{display:block;font-size:.8rem;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:.5rem;}
+    input,select,textarea{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;color:var(--text);font-size:.9rem;outline:none;font-family:'Inter',sans-serif;transition:border-color .2s;}
+    input:focus,select:focus{border-color:var(--accent);}
+    select option{background:var(--surface);}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+    .divider{text-align:center;color:var(--muted);font-size:.8rem;margin:.5rem 0;position:relative;}
+    .divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border);}
+    .divider::before{left:0;} .divider::after{right:0;}
+    .chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem;}
+    .chip{padding:.3rem .8rem;border:1px solid var(--border);border-radius:99px;font-size:.78rem;cursor:pointer;color:var(--muted);transition:all .2s;background:transparent;}
+    .chip:hover,.chip.active{border-color:var(--accent);color:var(--accent);background:rgba(124,92,252,.1);}
+    .btn{width:100%;margin-top:.5rem;background:var(--accent);color:#fff;border:none;padding:.9rem;border-radius:10px;font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .2s;}
+    .btn:hover{opacity:.88;} .btn:disabled{opacity:.5;cursor:not-allowed;}
+    .loader{display:none;text-align:center;padding:1rem;color:var(--muted);font-size:.9rem;}
+    @media(max-width:520px){.grid-2{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a href="/" class="back">← Back</a>
+    <h1>⚡ Generate Ideas</h1>
+  </div>
+
+  <div class="card">
+    <form action="/generate" method="POST" onsubmit="handleSubmit(event)">
+
+      <!-- Profession -->
+      <div class="field">
+        <div class="step">Step 1</div>
+        <label>Your Profession / Domain *</label>
+        <select name="profession" id="profession-select">
+          <option value="">-- Select a profession --</option>
+          {% for p in professions %}
+          <option value="{{ p }}">{{ p }}</option>
+          {% endfor %}
+        </select>
+        <div class="divider" style="margin-top:.8rem">or type your own</div>
+        <input type="text" name="custom_profession" placeholder="e.g. Cloud Architect, Game Developer..."/>
+      </div>
+
+      <!-- Experience -->
+      <div class="field">
+        <div class="step">Step 2</div>
+        <label>Experience Level</label>
+        <div class="chips">
+          <span class="chip active" onclick="selectChip(this,'experience','Beginner')">Beginner</span>
+          <span class="chip" onclick="selectChip(this,'experience','Intermediate')">Intermediate</span>
+          <span class="chip" onclick="selectChip(this,'experience','Advanced')">Advanced</span>
+        </div>
+        <input type="hidden" name="experience" id="experience" value="Beginner"/>
+      </div>
+
+      <!-- Tech stack -->
+      <div class="field">
+        <div class="step">Step 3</div>
+        <label>Preferred Tech Stack (optional)</label>
+        <input type="text" name="tech_stack" placeholder="e.g. React, Python, MySQL, Node.js"/>
+        <div class="chips" style="margin-top:.6rem">
+          <span class="chip" onclick="appendTech(this,'React')">React</span>
+          <span class="chip" onclick="appendTech(this,'Python')">Python</span>
+          <span class="chip" onclick="appendTech(this,'Node.js')">Node.js</span>
+          <span class="chip" onclick="appendTech(this,'MySQL')">MySQL</span>
+          <span class="chip" onclick="appendTech(this,'Flutter')">Flutter</span>
+          <span class="chip" onclick="appendTech(this,'Flask')">Flask</span>
+        </div>
+      </div>
+
+      <!-- Count -->
+      <div class="field">
+        <div class="step">Step 4</div>
+        <label>Number of Ideas</label>
+        <div class="grid-2">
+          <div class="chips">
+            <span class="chip active" onclick="selectChip(this,'count','2')">2 ideas</span>
+            <span class="chip" onclick="selectChip(this,'count','3')">3 ideas</span>
+            <span class="chip" onclick="selectChip(this,'count','5')">5 ideas</span>
+          </div>
+        </div>
+        <input type="hidden" name="count" id="count" value="2"/>
+      </div>
+
+      <button type="submit" class="btn" id="submit-btn">⚡ Generate My Ideas</button>
+    </form>
+    <div class="loader" id="loader">🤖 Claude is thinking... hang on!</div>
+  </div>
+</div>
+
+<script>
+function selectChip(el, field, val) {
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(field).value = val;
+}
+function appendTech(el, tech) {
+  const inp = document.querySelector('input[name="tech_stack"]');
+  const cur = inp.value.trim();
+  if (!cur.includes(tech)) inp.value = cur ? cur + ', ' + tech : tech;
+  el.classList.toggle('active');
+}
+function handleSubmit(e) {
+  const prof = document.getElementById('profession-select').value;
+  const custom = document.querySelector('[name="custom_profession"]').value.trim();
+  if (!prof && !custom) { alert('Profession select pannu or type pannu!'); e.preventDefault(); return; }
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('submit-btn').textContent = 'Generating...';
+  document.getElementById('loader').style.display = 'block';
+}
+</script>
+</body>
+</html>
